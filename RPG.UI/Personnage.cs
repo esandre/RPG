@@ -2,5 +2,10 @@
 
 public class Personnage
 {
-    public int Hp { get; } = 10;
+    public int Hp { get; private set; } = 10;
+
+    public void Attaquer(Personnage défenseur)
+    {
+        défenseur.Hp = 9;
+    }
 }
