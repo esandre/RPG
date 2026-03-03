@@ -37,4 +37,20 @@ public class PersonnageTest
         // ALORS le défenseur perd 1 HP
         Assert.Equal(hpInitiaux - 1, défenseur.Hp);
     }
+
+    [Fact(DisplayName = "2 HP perdu pour 2 coups")]
+    public void Perte2Hp()
+    {
+        // ETANT DONNE 2 personnage, un attaquant et un défenseur
+        var attaquant = new Personnage();
+        var défenseur = new Personnage();
+        var hpInitiaux = défenseur.Hp;
+
+        // QUAND l'attaquant attaque le défenseur 2 fois
+        attaquant.Attaquer(défenseur);
+        attaquant.Attaquer(défenseur);
+
+        // ALORS le défenseur perd 2 HP
+        Assert.Equal(hpInitiaux - 2, défenseur.Hp);
+    }
 }

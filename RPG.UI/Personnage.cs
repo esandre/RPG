@@ -6,6 +6,6 @@ public class Personnage
 
     public void Attaquer(Personnage défenseur)
     {
-        défenseur.Hp = 9;
+        défenseur.Hp -= 1;
     }
 }
