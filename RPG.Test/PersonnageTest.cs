@@ -20,37 +20,65 @@ public class PersonnageTest
         // QUAND
 
         // ALORS ses HP sont de 10
-        Assert.Equal(10, personnage.Hp);
+        Assert.Equal(10u, personnage.Hp);
     }
 
-    [Fact(DisplayName = "1 HP perdu à chaque coup")]
-    public void PerteHp()
+    [Theory(DisplayName = "1 HP perdu à chaque coup")]
+    [InlineData(1)]
+    [InlineData(2)]
+    public void PerteHpNCoups(ushort nombreCoups)
     {
-        // ETANT DONNE 2 personnage, un attaquant et un défenseur
+        // ETANT DONNE 2 personnages, un attaquant et un défenseur
         var attaquant = new Personnage();
+        var défenseur = new Personnage();
+        var hpInitiaux = défenseur.Hp;
+
+        // QUAND l'attaquant attaque le défenseur <nombreCoups> fois
+        for (var i = 0; i < nombreCoups; i++)
+        {
+            attaquant.Attaquer(défenseur);
+        }
+
+        // ALORS le défenseur perd <nombreCoups> HP
+        Assert.Equal(hpInitiaux - nombreCoups, défenseur.Hp);
+    }
+
+    [Fact(DisplayName = "Impossible de descendre sous zéro")]
+    public void ZeroMinimumHp()
+    {
+        // ETANT DONNE 2 personnages, un attaquant et un défenseur
+        var attaquant = new Personnage();
+        var défenseur = new Personnage();
+
+        // QUAND l'attaquant attaque le défenseur <hpTotal> + 1 fois
+        const ushort hpMax = 10;
+        for (var i = 0; i < hpMax + 1; i++)
+        {
+            attaquant.Attaquer(défenseur);
+        }
+
+        // ALORS le défenseur a 0 HP
+        Assert.Equal(0u, défenseur.Hp);
+    }
+
+    [Fact(DisplayName = "Un mort n'attaque pas")]
+    public void MortNAttaquePas()
+    {
+        // ETANT DONNE 2 personnages, un attaquant mort et un défenseur vivant
+        var attaquant = new Personnage();
+        const ushort hpMax = 10;
+        for (var i = 0; i < hpMax; i++)
+        {
+            attaquant.Attaquer(attaquant);
+        }
+
         var défenseur = new Personnage();
         var hpInitiaux = défenseur.Hp;
 
         // QUAND l'attaquant attaque le défenseur
         attaquant.Attaquer(défenseur);
 
-        // ALORS le défenseur perd 1 HP
-        Assert.Equal(hpInitiaux - 1, défenseur.Hp);
-    }
-
-    [Fact(DisplayName = "2 HP perdu pour 2 coups")]
-    public void Perte2Hp()
-    {
-        // ETANT DONNE 2 personnage, un attaquant et un défenseur
-        var attaquant = new Personnage();
-        var défenseur = new Personnage();
-        var hpInitiaux = défenseur.Hp;
-
-        // QUAND l'attaquant attaque le défenseur 2 fois
-        attaquant.Attaquer(défenseur);
-        attaquant.Attaquer(défenseur);
-
-        // ALORS le défenseur perd 2 HP
-        Assert.Equal(hpInitiaux - 2, défenseur.Hp);
+        // ALORS le défenseur ne perd aucun HP
+        Assert.Equal(hpInitiaux, défenseur.Hp);
     }
 }
