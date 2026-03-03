@@ -1,0 +1,60 @@
+name: Dev CI
+
+on:
+  push:
+    branches: [ dev ]
+    
+jobs:
+  test-and-ff:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Fast-forward master into dev
+        if: ${{ success() }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          
+          git push origin "${{ github.sha }}:master"
+
+      - name: Tests failed → creating failure branch and rolling back dev
+        if: failure()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          FAILURE_BRANCH="failure/${SHORT_SHA}"
+          DEV_BRANCH="dev"
+          
+          PREV_SHA=$(git rev-parse HEAD^)
+
+          echo "Tests failed on commit ${SHORT_SHA}. Creating branch ${FAILURE_BRANCH}"
+
+          git checkout -b $FAILURE_BRANCH
+          git push origin $FAILURE_BRANCH
+
+          git checkout $DEV_BRANCH
+          git reset --hard $PREV_SHA
+          git push origin $DEV_BRANCH --force
