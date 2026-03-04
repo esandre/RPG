@@ -1,5 +1,4 @@
 using RPG.Test.Utilities;
-using RPG.UI;
 
 namespace RPG.Test;
 
@@ -14,7 +13,7 @@ public class PersonnageTest
     public void HpInitiaux(ushort endurance, ushort level)
     {
         // ETANT DONNE un personnage ayant 1 END
-        var personnage = new Personnage(level, endurance, 0);
+        var personnage = new PersonnageBuilder { Level = level, Endurance = endurance }.Build();
 
         // QUAND
 
@@ -33,9 +32,9 @@ public class PersonnageTest
     [InlineData(2, 2, 2)]
     public void PerteHpNCoups(ushort nombreCoups, ushort level, ushort force)
     {
-        // ETANT DONNE 2 personnages, un attaquant et un défenseur
-        var attaquant = new Personnage(level, 0, force);
-        var défenseur = new Personnage(ushort.MaxValue, ushort.MaxValue, 0);
+        // ETANT DONNE 2 personnages, un attaquant et un défenseur 
+        var attaquant = new PersonnageBuilder { Level = level, Force = force }.Build();
+        var défenseur = PersonnageBuilder.SacDeFrappe;
         var hpInitiaux = défenseur.Hp;
 
         // QUAND l'attaquant attaque le défenseur <nombreCoups> fois en ayant le maximum de chance
@@ -52,8 +51,8 @@ public class PersonnageTest
     public void DegatsPasDeChance()
     {
         // ETANT DONNE 2 personnages, un attaquant et un défenseur
-        var attaquant = new Personnage(ushort.MaxValue, 0, ushort.MaxValue);
-        var défenseur = new Personnage(ushort.MaxValue, ushort.MaxValue, 0);
+        var attaquant = PersonnageBuilder.Stub;
+        var défenseur = PersonnageBuilder.SacDeFrappe;
         var hpInitiaux = défenseur.Hp;
 
         // ET un absence cruelle de chance
@@ -62,7 +61,7 @@ public class PersonnageTest
         // QUAND l'attaquant attaque le défenseur 1 fois
         attaquant.Attaquer(défenseur, rng);
 
-        // ALORS le défenseur perd 1 + (2*lvl) + FOR * <nombreCoups> HP
+        // ALORS le défenseur perd 0HP
         Assert.Equal(hpInitiaux, défenseur.Hp);
     }
 
@@ -70,8 +69,8 @@ public class PersonnageTest
     public void ZeroMinimumHp()
     {
         // ETANT DONNE 2 personnages, un attaquant et un défenseur
-        var attaquant = new Personnage(0, 0, 0);
-        var défenseur = new Personnage(0, 0, 0);
+        var attaquant = PersonnageBuilder.Stub;
+        var défenseur = PersonnageBuilder.Stub;
 
         // QUAND l'attaquant attaque le défenseur <hpTotal> + 1 fois
         const ushort hpMax = 10;
@@ -88,13 +87,10 @@ public class PersonnageTest
     public void MortNAttaquePas()
     {
         // ETANT DONNE 2 personnages, un attaquant mort et un défenseur vivant
-        var attaquant = new Personnage(0, 0, 0);
-        while (attaquant.Hp > 0)
-        {
-            attaquant.Attaquer(attaquant, new MaxLuckRng());
-        }
+        var attaquant = PersonnageBuilder.Stub;
+        attaquant.Tuer();
 
-        var défenseur = new Personnage(0, 0, 0);
+        var défenseur = PersonnageBuilder.Stub;
         var hpInitiaux = défenseur.Hp;
 
         // QUAND l'attaquant attaque le défenseur
