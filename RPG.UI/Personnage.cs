@@ -2,7 +2,14 @@
 
 public class Personnage
 {
-    public uint Hp { get; private set; } = 10;
+    private readonly ushort _endurance;
+
+    public Personnage(ushort endurance)
+    {
+        _endurance = endurance;
+    }
+
+    public uint Hp { get; private set; } = 11;
     private bool EstMort => Hp == 0;
 
     public void Attaquer(Personnage défenseur)
