@@ -21,14 +21,16 @@ public class PersonnageTest
         Assert.Equal(10u + 2*level + endurance, personnage.Hp);
     }
 
-    [Theory(DisplayName = "1 HP perdu à chaque coup")]
-    [InlineData(1)]
-    [InlineData(2)]
-    public void PerteHpNCoups(ushort nombreCoups)
+    [Theory(DisplayName = "1 + (2*lvl) HP perdus à chaque coup")]
+    [InlineData(1, 1)]
+    [InlineData(1, 2)]
+    [InlineData(2, 1)]
+    [InlineData(2, 2)]
+    public void PerteHpNCoups(ushort nombreCoups, ushort level)
     {
         // ETANT DONNE 2 personnages, un attaquant et un défenseur
-        var attaquant = new Personnage(0, 0);
-        var défenseur = new Personnage(0, 0);
+        var attaquant = new Personnage(level, 0);
+        var défenseur = new Personnage(ushort.MaxValue, ushort.MaxValue);
         var hpInitiaux = défenseur.Hp;
 
         // QUAND l'attaquant attaque le défenseur <nombreCoups> fois
@@ -38,7 +40,7 @@ public class PersonnageTest
         }
 
         // ALORS le défenseur perd <nombreCoups> HP
-        Assert.Equal(hpInitiaux - nombreCoups, défenseur.Hp);
+        Assert.Equal(hpInitiaux - (nombreCoups * (1 + 2*level)), défenseur.Hp);
     }
 
     [Fact(DisplayName = "Impossible de descendre sous zéro")]
