@@ -1,15 +1,13 @@
-﻿namespace RPG.UI;
+namespace RPG.UI;
 
 public class Personnage
 {
-    private readonly ushort _endurance;
-
     public Personnage(ushort endurance)
     {
-        _endurance = endurance;
+        Hp = 10u + endurance;
     }
 
-    public uint Hp { get; private set; } = 11;
+    public uint Hp { get; private set; }
     private bool EstMort => Hp == 0;
 
     public void Attaquer(Personnage défenseur)

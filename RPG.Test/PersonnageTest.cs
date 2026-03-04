@@ -1,19 +1,22 @@
-﻿using RPG.UI;
+using RPG.UI;
 
 namespace RPG.Test;
 
 public class PersonnageTest
 {
-    [Fact(DisplayName = "Les personnages ont 11HP initiaux avec 1 END")]
-    public void HpInitiaux()
+    [Theory(DisplayName = "Les personnages ont 10 + END HP initiaux")]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(ushort.MaxValue)]
+    public void HpInitiaux(ushort endurance)
     {
         // ETANT DONNE un personnage ayant 1 END
-        var personnage = new Personnage(endurance: 1);
+        var personnage = new Personnage(endurance);
 
         // QUAND
 
-        // ALORS ses HP sont de 11
-        Assert.Equal(11u, personnage.Hp);
+        // ALORS ses HP sont de 10 + <endurance>
+        Assert.Equal(10u + endurance, personnage.Hp);
     }
 
     [Theory(DisplayName = "1 HP perdu à chaque coup")]
