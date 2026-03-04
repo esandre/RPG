@@ -4,10 +4,10 @@ public class Personnage
 {
     private readonly uint _dégâts;
 
-    public Personnage(ushort level, ushort endurance)
+    public Personnage(ushort level, ushort endurance, ushort force)
     {
         Hp = 10u + endurance + 2u * level;
-        _dégâts = 1u + (2u * level);
+        _dégâts = 1u + (2u * level) + force;
     }
 
     public uint Hp { get; private set; }
