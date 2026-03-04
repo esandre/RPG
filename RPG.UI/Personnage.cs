@@ -13,10 +13,10 @@ public class Personnage
     public uint Hp { get; private set; }
     private bool EstMort => Hp == 0;
 
-    public void Attaquer(Personnage défenseur)
+    public void Attaquer(Personnage défenseur, IRandomGenerator rng)
     {
         if(EstMort) return;
         if(défenseur.EstMort) return;
-        défenseur.Hp -= _dégâts;
+        défenseur.Hp -= rng.PickValueBetweenZeroAnd(_dégâts);
     }
 }

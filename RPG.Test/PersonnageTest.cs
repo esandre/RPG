@@ -1,3 +1,4 @@
+using RPG.Test.Utilities;
 using RPG.UI;
 
 namespace RPG.Test;
@@ -21,7 +22,7 @@ public class PersonnageTest
         Assert.Equal(10u + 2*level + endurance, personnage.Hp);
     }
 
-    [Theory(DisplayName = "1 + (2*lvl) + FOR HP perdus à chaque coup")]
+    [Theory(DisplayName = "1 + (2*lvl) + FOR HP perdus au maximum à chaque coup")]
     [InlineData(1, 1, 1)]
     [InlineData(1, 2, 1)]
     [InlineData(2, 1, 1)]
@@ -37,14 +38,32 @@ public class PersonnageTest
         var défenseur = new Personnage(ushort.MaxValue, ushort.MaxValue, 0);
         var hpInitiaux = défenseur.Hp;
 
-        // QUAND l'attaquant attaque le défenseur <nombreCoups> fois
+        // QUAND l'attaquant attaque le défenseur <nombreCoups> fois en ayant le maximum de chance
         for (var i = 0; i < nombreCoups; i++)
         {
-            attaquant.Attaquer(défenseur);
+            attaquant.Attaquer(défenseur, new MaxLuckRng());
         }
 
-        // ALORS le défenseur perd <nombreCoups> HP
+        // ALORS le défenseur perd 1 + (2*lvl) + FOR * <nombreCoups> HP
         Assert.Equal(hpInitiaux - (nombreCoups * (1 + 2*level + force)), défenseur.Hp);
+    }
+
+    [Fact]
+    public void DegatsPasDeChance()
+    {
+        // ETANT DONNE 2 personnages, un attaquant et un défenseur
+        var attaquant = new Personnage(ushort.MaxValue, 0, ushort.MaxValue);
+        var défenseur = new Personnage(ushort.MaxValue, ushort.MaxValue, 0);
+        var hpInitiaux = défenseur.Hp;
+
+        // ET un absence cruelle de chance
+        var rng = new MinLuckRng();
+
+        // QUAND l'attaquant attaque le défenseur 1 fois
+        attaquant.Attaquer(défenseur, rng);
+
+        // ALORS le défenseur perd 1 + (2*lvl) + FOR * <nombreCoups> HP
+        Assert.Equal(hpInitiaux, défenseur.Hp);
     }
 
     [Fact(DisplayName = "Impossible de descendre sous zéro")]
@@ -58,7 +77,7 @@ public class PersonnageTest
         const ushort hpMax = 10;
         for (var i = 0; i < hpMax + 1; i++)
         {
-            attaquant.Attaquer(défenseur);
+            attaquant.Attaquer(défenseur, new MaxLuckRng());
         }
 
         // ALORS le défenseur a 0 HP
@@ -72,14 +91,14 @@ public class PersonnageTest
         var attaquant = new Personnage(0, 0, 0);
         while (attaquant.Hp > 0)
         {
-            attaquant.Attaquer(attaquant);
+            attaquant.Attaquer(attaquant, new MaxLuckRng());
         }
 
         var défenseur = new Personnage(0, 0, 0);
         var hpInitiaux = défenseur.Hp;
 
         // QUAND l'attaquant attaque le défenseur
-        attaquant.Attaquer(défenseur);
+        attaquant.Attaquer(défenseur, new MaxLuckRng());
 
         // ALORS le défenseur ne perd aucun HP
         Assert.Equal(hpInitiaux, défenseur.Hp);
