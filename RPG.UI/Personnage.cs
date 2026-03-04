@@ -2,9 +2,9 @@ namespace RPG.UI;
 
 public class Personnage
 {
-    public Personnage(ushort endurance)
+    public Personnage(ushort level, ushort endurance)
     {
-        Hp = 10u + endurance;
+        Hp = 10u + endurance + 2u * level;
     }
 
     public uint Hp { get; private set; }
